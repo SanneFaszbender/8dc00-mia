@@ -41,6 +41,10 @@ def rotate(phi):
 
     #------------------------------------------------------------------#
     # TODO: Implement transformation matrix for rotation.
+    c = np.cos(phi)
+    s = np.sin(phi)
+
+    T = np.array([[c,-s],[s,c]])
     #------------------------------------------------------------------#
 
     return T
@@ -56,6 +60,7 @@ def shear(cx, cy):
 
     #------------------------------------------------------------------#
     # TODO: Implement transformation matrix for shear.
+    T = np.array([[1,cx],[cy,1]])
     #------------------------------------------------------------------#
 
     return T
@@ -76,8 +81,8 @@ def reflect(rx, ry):
 
     #------------------------------------------------------------------#
     # TODO: Implement transformation matrix for reflection
+    T = np.array([[-1,0],[0,-1]])
     #------------------------------------------------------------------#
-
     return T
 
 
@@ -114,6 +119,8 @@ def image_transform(I, Th,  output_shape=None):
 
     #------------------------------------------------------------------#
     # TODO: Perform inverse coordinates mapping.
+    inverse = np.linalg.inv(Th)
+    Xt = inverse.dot(Xh)
     #------------------------------------------------------------------#
 
     It = ndimage.map_coordinates(I, [Xt[1,:], Xt[0,:]], order=1, mode='constant').reshape(I.shape)
@@ -132,6 +139,12 @@ def ls_solve(A, b):
 
     #------------------------------------------------------------------#
     # TODO: Implement the least-squares solution for w.
+    AT = np.transpose(A)
+
+    deel1 = np.linalg.inv(AT.dot(A))
+    deel2 = AT.dot(b)
+    w = deel1.dot(deel2)
+
     #------------------------------------------------------------------#
 
     # compute the error
@@ -153,6 +166,17 @@ def ls_affine(X, Xm):
     #------------------------------------------------------------------#
     # TODO: Implement least-squares fitting of an affine transformation.
     # Use the ls_solve() function that you have previously implemented.
+
+    b = np.transpose(X)
+    b_1 = b[:,0]
+    b_2 = b[:,1]
+
+    T_1, _ = np.transpose(ls_solve(A,b_1))
+    T_2, _ = np.transpose(ls_solve(A,b_2))
+
+    T = np.eye(3)
+    T[0,:] = T_1
+    T[1,:] = T_2
     #------------------------------------------------------------------#
 
     return T
@@ -182,6 +206,10 @@ def correlation(I, J):
     #------------------------------------------------------------------#
     # TODO: Implement the computation of the normalized cross-correlation.
     # This can be done with a single line of code, but you can use for-loops instead.
+    uT = np.transpose(u)
+    vT = np.transpose(v)
+
+    CC = (uT.dot(v))/(np.sqrt(uT.dot(u))*np.sqrt(vT.dot(v)))
     #------------------------------------------------------------------#
 
     return CC
@@ -232,6 +260,7 @@ def joint_histogram(I, J, num_bins=16, minmax_range=None):
     # intensities in the two images. You need to implement one final
     # step to make p take the form of a probability mass function
     # (p.m.f.).
+    p = p/n
     #------------------------------------------------------------------#
 
     return p
@@ -263,6 +292,9 @@ def mutual_information(p):
     # can use a for-loop instead.
     # HINT: p_I is a column-vector and p_J is a row-vector so their
     # product is a matrix. You can also use the sum() function here.
+
+    MI = p*(np.log(p/(p_I.dot(p_J))))
+    MI = np.sum(MI)
     #------------------------------------------------------------------#
 
     return MI
@@ -292,6 +324,19 @@ def mutual_information_e(p):
     #------------------------------------------------------------------#
     # TODO: Implement the computation of the mutual information via
     # computation of entropy.
+    p_I_T = np.transpose(p_I)
+    p_J_T = np.transpose(p_J)
+
+    H_I = -p_I_T.dot(np.log(p_I))
+    H_J = -p_J.dot(np.log(p_J_T))
+
+    p_IJ = p.reshape(-1, 1)
+    p_IJ_T = np.transpose(p_IJ)
+    H_IJ = -p_IJ_T.dot(np.log(p_IJ))
+
+    MI = H_I + H_J - H_IJ
+
+    #joint histogram reshape (flatten) naar 1D, wordt vector die je kan gebruiken zoals p_J en p_I
     #------------------------------------------------------------------#
 
     return MI

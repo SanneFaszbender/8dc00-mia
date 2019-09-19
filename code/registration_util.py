@@ -39,21 +39,28 @@ def t2h(T, t):
     # Convert a 2D transformation matrix to homogeneous form.
     # Input:
     # T - 2D transformation matrix
-    # Xt - 2D translation vector
+    # t - 2D translation vector
     # Output:
     # Th - homogeneous transformation matrix
 
     #------------------------------------------------------------------#
     # TODO: Implement conversion of a transformation matrix and a translation vector to homogeneous transformation matrix.
+    #pass
+    #print(T)
+    #print(t)
+    t = t[np.newaxis, :]    #nette manier om extra [ ] omheen te zetten
+    Th = np.concatenate((T,np.transpose(t)), 1)     #transpose t omdat deze anders aan de onderkant komt
+    Th = np.concatenate((Th, np.array([[0,0,1]])),0)    #hier staat gewoon extra [ ] omheen
+    return Th
     #------------------------------------------------------------------#
 
-
 def plot_object(ax, X):
+    
+    
     # Plot 2D object.
     #
     # Input:
     # X - coordinates of the shape
-
     ax.plot(X[0,:], X[1,:], linewidth=2);
 
 
