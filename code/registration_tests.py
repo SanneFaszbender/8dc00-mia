@@ -155,15 +155,13 @@ def image_transform_test():
 
 
 def ls_solve_test():
-
     #------------------------------------------------------------------#
     # TODO: Test your implementation of the ls_solve definition
+
     A = np.array([[3,4], [5,6], [7,8], [17, 10]])
     b = np.array([[1],[2],[3],[4]])
     w = reg.ls_solve(A,b)
     return w
-
-    #------------------------------------------------------------------#
 
 def ls_affine_test():
 

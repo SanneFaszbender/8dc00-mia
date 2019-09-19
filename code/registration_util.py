@@ -52,17 +52,15 @@ def t2h(T, t):
     Th = np.concatenate((T,np.transpose(t)), 1)     #transpose t omdat deze anders aan de onderkant komt
     Th = np.concatenate((Th, np.array([[0,0,1]])),0)    #hier staat gewoon extra [ ] omheen
     return Th
+
     #------------------------------------------------------------------#
 
 def plot_object(ax, X):
-    
-    
     # Plot 2D object.
-    #
+
     # Input:
     # X - coordinates of the shape
-    ax.plot(X[0,:], X[1,:], linewidth=2);
-
+    ax.plot(X[0,:], X[1,:], linewidth=2)
 
 def my_cpselect(I_path, Im_path):
     # Wrapper around cpselect that returns the point coordinates
