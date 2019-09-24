@@ -74,6 +74,34 @@ def my_cpselect(I_path, Im_path):
 
     #------------------------------------------------------------------#
     # TODO: Call cpselect and modify the returned point coordinates.
+
+    # Using cpselect to receive coordinates points
+
+    controlpointlist = cpselect(I_path, Im_path)  # List of dictionary with control points
+
+    # For loop over the selected points and storing in list
+    x_1 = []
+    y_1 = []
+    x_2 = []
+    y_2 = []
+
+    # For-loop
+    for dict in controlpointlist:
+        x_1.append(dict['img1_x'])
+        y_1.append(dict['img1_y'])
+        x_2.append(dict['img2_x'])
+        y_2.append(dict['img2_y'])
+
+    # Turning lists into arrays
+
+    x_1 = np.asarray(x_1)
+    y_1 = np.asarray(y_1)
+    x_2 = np.asarray(x_2)
+    y_2 = np.asarray(y_2)
+
+    X = np.concatenate(([x_1], [y_1]))
+    Xm = np.concatenate(([x_2], [y_2]))
+
     #------------------------------------------------------------------#
 
     return X, Xm
