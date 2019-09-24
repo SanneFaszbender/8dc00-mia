@@ -276,6 +276,9 @@ def ngradient_test():
 
     #------------------------------------------------------------------#
     # TODO: Implement a few more test cases of ngradient
+    print(exponential)
+    print(g1)
+
     #------------------------------------------------------------------#
 
     print('Test successful!')

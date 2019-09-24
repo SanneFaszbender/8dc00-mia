@@ -358,6 +358,29 @@ def ngradient(fun, x, h=1e-3):
     # TODO: Implement the  computation of the partial derivatives of
     # the function at x with numerical differentiation.
     # g[k] should store the partial derivative w.r.t. the k-th parameter
+
+
+    # g = []
+    # for k in range(len(x)):
+    #     x1 = x[k] + h/2
+    #     x2 = x[k] - h/2
+    #     d_dx = (fun(x1) - fun(x2))/h
+    #     g.append(d_dx)
+    #     print(g)
+
+    g = np.zeros_like(x)
+
+    for k in range(np.size(x)):
+        x1 = np.copy(x)
+        x2 = np.copy(x)
+        x1[k] = x1[k] + (h/2)
+        x2[k] = x2[k] - (h/2)
+        fun1 = fun(x1)
+        fun2 = fun(x2)
+        if isinstance(fun1, tuple):
+            fun1 = fun1[0]
+            fun2 = fun2[0]
+        g[k] = ((fun1-fun2)/h)
     #------------------------------------------------------------------#
 
     return g
@@ -422,6 +445,8 @@ def affine_corr(I, Im, x):
 
     #------------------------------------------------------------------#
     # TODO: Implement the missing functionality
+
+    result = rigid_corr(I, Im, x)
     #------------------------------------------------------------------#
 
     return C, Im_t, Th
