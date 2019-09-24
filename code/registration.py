@@ -446,7 +446,16 @@ def affine_corr(I, Im, x):
     #------------------------------------------------------------------#
     # TODO: Implement the missing functionality
 
-    result = rigid_corr(I, Im, x)
+    T_rot = rotate(x[0])
+    T_scale = scale(x[1], x[2])
+    T_shear = shear(x[3], x[4])
+    T = T_rot.dot(T_scale.dot(T_shear))
+
+    Th = util.t2h(T, x[5:] * SCALING)
+
+    Im_t, Xt = image_transform(Im, Th)
+
+    C = correlation(I, Im_t)
     #------------------------------------------------------------------#
 
     return C, Im_t, Th
@@ -472,6 +481,23 @@ def affine_mi(I, Im, x):
     
     #------------------------------------------------------------------#
     # TODO: Implement the missing functionality
+
+    T_rot = rotate(x[0])
+    T_scale = scale(x[1], x[2])
+    T_shear = shear(x[3], x[4])
+
+    # Transformation
+
+    T = T_rot.dot(T_scale.dot(T_shear))  # Total affine transformation matrix
+
+    Th = util.t2h(T, x[5:] * SCALING)  # Transformation matrix homogeneous
+
+    Im_t, Xt = image_transform(Im, Th)  # Transforming image Im to Im_t
+
+    p = joint_histogram(I, Im_t, NUM_BINS)  # Probability mass function
+    MI = mutual_information(p)  # Mutual information between Image I and transformed image
+
     #------------------------------------------------------------------#
+
 
     return MI, Im_t, Th
