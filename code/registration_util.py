@@ -102,6 +102,16 @@ def my_cpselect(I_path, Im_path):
     X = np.concatenate(([x_1], [y_1]))
     Xm = np.concatenate(([x_2], [y_2]))
 
+    ones = np.zeros_like(x_1)
+    ones[:] = 1
+
+    Matrix_X = np.concatenate((X, [ones]), 0)
+    Matrix_Xm = np.concatenate((Xm, [ones]), 0)
+
+    #print("Matrix_X = " + str(Matrix_X))
+    #print("Matrix_Xm = " + str(Matrix_Xm))
+
+
     #------------------------------------------------------------------#
 
-    return X, Xm
+    return Matrix_X, Matrix_Xm

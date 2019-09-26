@@ -121,6 +121,7 @@ def image_transform(I, Th,  output_shape=None):
     # TODO: Perform inverse coordinates mapping.
     inverse = np.linalg.inv(Th)
     Xt = inverse.dot(Xh)
+
     #------------------------------------------------------------------#
 
     It = ndimage.map_coordinates(I, [Xt[1,:], Xt[0,:]], order=1, mode='constant').reshape(I.shape)
@@ -144,7 +145,6 @@ def ls_solve(A, b):
     deel1 = np.linalg.inv(AT.dot(A))
     deel2 = AT.dot(b)
     w = deel1.dot(deel2)
-
     #------------------------------------------------------------------#
 
     # compute the error
@@ -171,12 +171,16 @@ def ls_affine(X, Xm):
     b_1 = b[:,0]
     b_2 = b[:,1]
 
-    T_1, _ = np.transpose(ls_solve(A,b_1))
-    T_2, _ = np.transpose(ls_solve(A,b_2))
+    T_1, _ = ls_solve(A,b_1)
+    T_2, _ = ls_solve(A,b_2)
 
-    T = np.eye(3)
-    T[0,:] = T_1
-    T[1,:] = T_2
+    print("T_1 =" + str(T_1))
+    # T = np.eye(3) #np.eye(len(X))
+    # T[0,:] = T_1
+    # T[1,:] = T_2
+
+    T = np.array([T_1, T_2, [0,0,1]])
+
     #------------------------------------------------------------------#
 
     return T

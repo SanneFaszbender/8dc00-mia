@@ -84,3 +84,23 @@ def intensity_based_registration_demo():
         learning_curve.set_ydata(similarity)
 
         display(fig)
+
+# ------------------------------------------------------------------#
+# TODO: Eigen code om poin-based registration uit te voeren
+import registration_util as util
+
+def my_point_based_registration():
+    I = '../data/image_data/3_2_t1.tif'
+    I_d = '../data/image_data/3_2_t1_d.tif'
+    I_plt = plt.imread('../data/image_data/3_2_t1.tif')
+    I_d_plt = plt.imread('../data/image_data/3_2_t1_d.tif')
+
+    X, Xm = util.my_cpselect(I, I_d)
+    affine_transformation = reg.ls_affine(X, Xm)
+    transformed_moving_image, transformed_vector  = reg.image_transform(I_d_plt, affine_transformation)
+
+    fig = plt.figure(figsize = (12,5))
+    ax1 = fig.add_subplot(131)
+    Im1 = ax1.imshow(I_d_plt)
+    Im2 = ax1.imshow(I_plt, alpha=0.7)
+    #return transformed_moving_image
