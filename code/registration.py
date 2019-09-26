@@ -179,7 +179,19 @@ def ls_affine(X, Xm):
     # T[0,:] = T_1
     # T[1,:] = T_2
 
+    # Errors from solving Ax=b1 and Ax=b2
+
+    _, E1 = ls_solve(A, b_1)
+    _, E2 = ls_solve(A, b_2)
+
+    # The sum of the errors // Total error
+    E = E1+E2
+
+    #Printing the error on the screen
+    print("The Error = " + str(E))
+    
     T = np.array([T_1, T_2, [0,0,1]])
+
 
     #------------------------------------------------------------------#
 
