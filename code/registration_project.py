@@ -101,9 +101,26 @@ def my_point_based_registration():
 
     fig = plt.figure(figsize = (12,5))
     ax1 = fig.add_subplot(131)
-    Im1 = ax1.imshow(I_d_plt)
-    Im2 = ax1.imshow(I_plt, alpha=0.7)
+    Im1 = ax1.imshow(I_plt)     # Fixed image or Transformed image
+    Im2 = ax1.imshow(transformed_moving_image, alpha=0.7)   # Transformed image or Fixed image
     #return transformed_moving_image
+
+
+def my_point_based_registration_2():
+
+    I2 = '../data/image_data/3_2_t1.tif'                    # Tweede opdracht T1 slide
+    I_d_2 = '../data/image_data/3_2_t2.tif'                 # T2 slice
+    I_plt_2 = plt.imread('../data/image_data/3_2_t1.tif')
+    I_d_plt_2 = plt.imread('../data/image_data/3_2_t1_d.tif')
+
+    X2, Xm2 = util.my_cpselect(I2, I_d_2)
+    affine_transformation_2 = reg.ls_affine(X2, Xm2)
+    transformed_moving_image_2, transformed_vector_2  = reg.image_transform(I_d_plt_2, affine_transformation_2)
+
+    fig = plt.figure(figsize = (12,5))
+    ax1 = fig.add_subplot(131)
+    Im1 = ax1.imshow(I_plt_2)     # Fixed image or Transformed image, Je mag wisselen
+    Im2 = ax1.imshow(transformed_moving_image_2, alpha=0.7)   # Transformed image or Fixed image  Mag wisselen
     
 def intensity_based_registration_affine_cc(im1, im2):
 
