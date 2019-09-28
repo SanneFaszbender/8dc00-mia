@@ -197,10 +197,10 @@ def ls_affine(X, Xm):
     Affine_error_T = np.transpose(T.dot(Xm) - X).dot(T.dot(Xm) - X)
 
     for k in range(len(Affine_error_T)):
-        min_val = min(Affine_error_T[k])
+        min_val = min(abs(i) for i in Affine_error_T[k])
         Affine_error_list.append(min_val)
 
-    Affine_error = min(abs(Affine_error_list))
+    Affine_error = min(Affine_error_list)
 
     #Printing the error on the screen
 
