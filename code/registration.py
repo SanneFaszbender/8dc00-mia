@@ -200,7 +200,7 @@ def ls_affine(X, Xm):
         min_val = min(Affine_error_T[k])
         Affine_error_list.append(min_val)
 
-    Affine_error = min(Affine_error_list)
+    Affine_error = abs(min(Affine_error_list))
 
     #Printing the error on the screen
 
