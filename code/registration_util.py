@@ -44,23 +44,22 @@ def t2h(T, t):
     # Th - homogeneous transformation matrix
 
     #------------------------------------------------------------------#
-    # TODO: Implement conversion of a transformation matrix and a translation vector to homogeneous transformation matrix.
-    #pass
-    #print(T)
-    #print(t)
-    t = t[np.newaxis, :]    #nette manier om extra [ ] omheen te zetten
-    Th = np.concatenate((T,np.transpose(t)), 1)     #transpose t omdat deze anders aan de onderkant komt
-    Th = np.concatenate((Th, np.array([[0,0,1]])),0)    #hier staat gewoon extra [ ] omheen
+    t = t[np.newaxis, :]
+    Th_1 = np.concatenate((T,t.T),1) #t.T is zelfde als np.transpose(t)
+    Th = np.concatenate((Th_1, np.array([[0,0,1]])),0)
     return Th
-
+    
     #------------------------------------------------------------------#
+
 
 def plot_object(ax, X):
     # Plot 2D object.
 
     # Input:
     # X - coordinates of the shape
+
     ax.plot(X[0,:], X[1,:], linewidth=2)
+
 
 def my_cpselect(I_path, Im_path):
     # Wrapper around cpselect that returns the point coordinates
@@ -74,44 +73,6 @@ def my_cpselect(I_path, Im_path):
 
     #------------------------------------------------------------------#
     # TODO: Call cpselect and modify the returned point coordinates.
-
-    # Using cpselect to receive coordinates points
-
-    controlpointlist = cpselect(I_path, Im_path)  # List of dictionary with control points
-
-    # For loop over the selected points and storing in list
-    x_1 = []
-    y_1 = []
-    x_2 = []
-    y_2 = []
-
-    # For-loop
-    for dict in controlpointlist:
-        x_1.append(dict['img1_x'])
-        y_1.append(dict['img1_y'])
-        x_2.append(dict['img2_x'])
-        y_2.append(dict['img2_y'])
-
-    # Turning lists into arrays
-
-    x_1 = np.asarray(x_1)
-    y_1 = np.asarray(y_1)
-    x_2 = np.asarray(x_2)
-    y_2 = np.asarray(y_2)
-
-    X = np.concatenate(([x_1], [y_1]))
-    Xm = np.concatenate(([x_2], [y_2]))
-
-    ones = np.zeros_like(x_1)
-    ones[:] = 1
-
-    Matrix_X = np.concatenate((X, [ones]), 0)
-    Matrix_Xm = np.concatenate((Xm, [ones]), 0)
-
-    #print("Matrix_X = " + str(Matrix_X))
-    #print("Matrix_Xm = " + str(Matrix_Xm))
-
-
     #------------------------------------------------------------------#
 
-    return Matrix_X, Matrix_Xm
+    return X, Xm
