@@ -179,8 +179,33 @@ def ls_affine(X, Xm):
     # T[0,:] = T_1
     # T[1,:] = T_2
 
-    T = np.array([T_1, T_2, [0,0,1]])
+    # Errors from solving Ax=b1 and Ax=b2
 
+    _, E1 = ls_solve(A, b_1)
+    _, E2 = ls_solve(A, b_2)
+
+    # The sum of the errors // Total error
+    E = E1+E2
+
+    # Transformation Matrix
+
+    T = np.array([T_1, T_2, [0, 0, 1]])
+
+    # Computing the Affine Error
+
+    Affine_error_list = []
+    Affine_error_T = np.transpose(T.dot(Xm) - X).dot(T.dot(Xm) - X)
+
+    for k in range(len(Affine_error_T)):
+        min_val = min(abs(i) for i in Affine_error_T[k])
+        Affine_error_list.append(min_val)
+
+    Affine_error = min(Affine_error_list)
+
+    #Printing the error on the screen
+
+    print("The Error = " + str(E))
+    print("The Affine Error = " + str(Affine_error))
     #------------------------------------------------------------------#
 
     return T
