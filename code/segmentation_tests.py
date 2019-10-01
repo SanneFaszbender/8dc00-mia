@@ -27,7 +27,7 @@ def scatter_data_test(showFigs=True):
     gt_mask = GT>0
     Y = gt_mask.flatten() # labels
 
-    I_blurred = ndimage.gaussian_filter(I, sigma=2)
+    I_blurred = ndimage.gaussian_filter(I, sigma=5)
     X2 = I_blurred.flatten().T
     X2 = X2.reshape(-1, 1)
 
@@ -66,8 +66,20 @@ def scatter_t2_test(showFigs=True):
 
     #------------------------------------------------------------------#
     # TODO: Extract features from the T2 image and compare them to the T1 features
+    I3 = plt.imread('../data/dataset_brains/1_1_t2.tif')
+    I3 = ndimage.gaussian_filter(I3, sigma=2)
+    X3 = I3.flatten().T
+    X3 = X3.reshape(-1,1)
+
+    X_data_1 = np.concatenate((X1, X2, X3), axis=1)
+
+    if showFigs:
+        util.scatter_data(X_data_1,Y,1,2)
+
+    if showFigs:
+        util.scatter_data(X_data_1,Y,0,1)
     #------------------------------------------------------------------#
-    return X_data, Y
+    return X_data_1, Y
 
 
 def extract_coordinate_feature_test():

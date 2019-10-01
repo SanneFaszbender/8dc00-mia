@@ -62,7 +62,10 @@ def extract_coordinate_feature(im):
     
     #------------------------------------------------------------------#
     # TODO: Use the above variables to create an image coord_im
-    # that combines the information from x_coord and y_coord 
+    # that combines the information from x_coord and y_coord
+    dx = x_coord - x_center
+    dy = y_coord - y_center
+    coord_im = np.sqrt(dx**2+dy**2)
     #------------------------------------------------------------------#
     
     # Create a feature from the coordinate image
