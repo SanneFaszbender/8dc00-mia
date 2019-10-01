@@ -32,7 +32,7 @@ def intensity_based_registration_demo():
     fun = lambda x: reg.rigid_corr(I, Im, x)
 
     # the learning rate
-    mu = 0.001
+    mu = 0.003
 
     # number of iterations
     num_iter = 200
@@ -129,10 +129,11 @@ def intensity_based_registration_affine_cc(im1, im2):
     fun = lambda x: reg.affine_corr(I, Im, x)
 
     # the learning rate
-    mu = 0.001
+    #mu = 0.0004 
+    mu = 0.0006 
 
     # number of iterations
-    num_iter = 200
+    num_iter = 250
 
     iterations = np.arange(1, num_iter+1)
     similarity = np.full((num_iter, 1), np.nan)
@@ -206,10 +207,10 @@ def intensity_based_registration_affine_mi(im1, im2):
     fun = lambda x: reg.affine_mi(I, Im, x)
 
     # the learning rate
-    mu = 0.001
+    mu = 0.00006
 
     # number of iterations
-    num_iter = 200
+    num_iter = 50
 
     iterations = np.arange(1, num_iter+1)
     similarity = np.full((num_iter, 1), np.nan)
