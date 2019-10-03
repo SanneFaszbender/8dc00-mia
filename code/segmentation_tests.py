@@ -38,6 +38,22 @@ def scatter_data_test(showFigs=True):
 
     #------------------------------------------------------------------#
     # TODO: Implement a few test cases of with different features
+    I_blurred = ndimage.gaussian_filter(I, sigma=5)     #nieuwe feature gemaakt door andere sigma in gaussische filter te gebruiken
+    X3 = I_blurred.flatten().T
+    X3 = X3.reshape(-1, 1)
+
+    I_blurred = ndimage.gaussian_filter(I, sigma=10)
+    X4 = I_blurred.flatten().T
+    X4 = X4.reshape(-1, 1)
+
+    X_data = np.concatenate((X_data, X3), axis=1)
+    X_data = np.concatenate((X_data, X4), axis=1)
+
+
+    if showFigs:
+        util.scatter_data(X_data,Y, 1, 2)           #plot feature 2 tegen 3
+        util.scatter_data(X_data, Y, 2, 3)          #plot feature 3 tegen 4
+
     #------------------------------------------------------------------#
     return X_data, Y
 
@@ -66,6 +82,14 @@ def scatter_t2_test(showFigs=True):
 
     #------------------------------------------------------------------#
     # TODO: Extract features from the T2 image and compare them to the T1 features
+    I2_blurred = ndimage.gaussian_filter(I2, sigma=4)       #I2 normal intensity is al berekend, dit berekend I2_blurred
+    X22 = I2_blurred.flatten().T
+    X22 = X12.reshape(-1, 1)
+    X_data = np.concatenate((X_data, X2), axis=1)
+    X_data = np.concatenate((X_data, X22), axis=1)
+
+    if showFigs:
+        util.scatter_data(X_data,Y,2,3)                     #Plot normal intensities tegen blurred intensities van I2
     #------------------------------------------------------------------#
     return X_data, Y
 
@@ -87,6 +111,12 @@ def feature_stats_test():
     X_data = np.concatenate((X, c), axis=1)
     #------------------------------------------------------------------#
     # TODO: Write code to examine the mean and standard deviation of your dataset containing variety of features
+    mean = np.mean(X_data, axis=1)       #berekent mean per rij
+    standard_deviation = np.std(X_data, axis=1)
+
+    # print("Mean is" + str(mean))
+    # print("Std is" + str(standard_deviation))
+    # print(X_data)
     #------------------------------------------------------------------#
 
 
@@ -98,6 +128,13 @@ def normalized_stats_test():
     #------------------------------------------------------------------#
     # TODO: Write code to normalize your dataset containing variety of features,
     #  then examine the mean and std dev
+
+    normdata, _ = seg.normalize_data(X_data)        #output van def normalize_data is 2 variables
+
+    # mean = np.mean(normdata, axis=1)
+    # standard_deviation = np.std(normdata, axis=1)
+    # print("Mean is" + str(mean))
+    # print("Std is" + str(standard_deviation))
     #------------------------------------------------------------------#
 
 
@@ -105,16 +142,23 @@ def distance_test():
     #------------------------------------------------------------------#
     # TODO: Generate a Gaussian dataset, with 100 samples per class, and compute the distances.
     #  Use plt.imshow() to visualize the distance matrix as an image.
+    X, _ = seg.generate_gaussian_data(100)          # Generates 100 samples per Gaussian class
+    #X = np.round(X * 3)                             # Stretch and round the numbers
+    D = scipy.spatial.distance.cdist(X, X, metric='euclidean')
+    plt.imshow(D)
+
     #------------------------------------------------------------------#
-    pass
 
 def small_samples_distance_test():
     #------------------------------------------------------------------#
     # TODO: Generate a small sample Gaussian dataset X,
     #  create dataset C as per the instructions,
     #  and calculate and plot the distances between the datasets.
+    X, _ = seg.generate_gaussian_data(2)
+    C = np.array([[0, 0], [1, 1]])
+    D = scipy.spatial.distance.cdist(X, C, metric='euclidean')
+    plt.imshow(D)
     #------------------------------------------------------------------#
-    pass
 
 def minimum_distance_test(X, Y, C, D):
     #------------------------------------------------------------------#
