@@ -19,6 +19,36 @@ def ngradient(fun, x, h=1e-3):
     # TODO: Implement the  computation of the partial derivatives of
     # the function at x with numerical differentiation.
     # g[k] should store the partial derivative w.r.t. the k-th parameter
+
+    g = np.zeros_like(x)
+    for k in range(x.size):
+        xh1 = x.copy()
+        xh2 = x.copy()
+        xh1[k] = xh1[k] + h/2
+        xh2[k] = xh2[k] - h/2
+        a = fun(xh1)
+        b = fun(xh2)
+        if isinstance(a, tuple):
+            g[k] = (a[0] -b[0])/h
+        else:
+            g[k] = (a - b)/h
+
+
+
+    #originele code
+    # g = np.zeros_like(x)
+    #
+    # for k in range(np.size(x)):
+    #     x1 = np.copy(x)
+    #     x2 = np.copy(x)
+    #     x1[k] = x1[k] + (h / 2)
+    #     x2[k] = x2[k] - (h / 2)
+    #     fun1 = fun(x1)
+    #     fun2 = fun(x2)
+    #     if isinstance(fun1, tuple):
+    #         fun1 = fun1[0]
+    #         fun2 = fun2[0]
+    #     g[k] = ((fun1 - fun2) / h)
     #------------------------------------------------------------------#
 
     return g

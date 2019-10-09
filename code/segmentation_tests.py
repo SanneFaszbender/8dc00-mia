@@ -111,11 +111,11 @@ def feature_stats_test():
     X_data = np.concatenate((X, c), axis=1)
     #------------------------------------------------------------------#
     # TODO: Write code to examine the mean and standard deviation of your dataset containing variety of features
-    mean = np.mean(X_data, axis=1)       #berekent mean per rij
-    standard_deviation = np.std(X_data, axis=1)
+    mean = np.mean(X_data, axis=0)       #berekent mean per rij
+    standard_deviation = np.std(X_data, axis=0)
 
-    # print("Mean is" + str(mean))
-    # print("Std is" + str(standard_deviation))
+    print("Mean is" + str(mean))
+    print("Std is" + str(standard_deviation))
     # print(X_data)
     #------------------------------------------------------------------#
 
@@ -131,10 +131,10 @@ def normalized_stats_test():
 
     normdata, _ = seg.normalize_data(X_data)        #output van def normalize_data is 2 variables
 
-    # mean = np.mean(normdata, axis=1)
-    # standard_deviation = np.std(normdata, axis=1)
-    # print("Mean is" + str(mean))
-    # print("Std is" + str(standard_deviation))
+    mean = np.mean(normdata, axis=0)
+    standard_deviation = np.std(normdata, axis=0)
+    print("Mean is" + str(mean))
+    print("Std is" + str(standard_deviation))
     #------------------------------------------------------------------#
 
 
@@ -142,11 +142,9 @@ def distance_test():
     #------------------------------------------------------------------#
     # TODO: Generate a Gaussian dataset, with 100 samples per class, and compute the distances.
     #  Use plt.imshow() to visualize the distance matrix as an image.
-    X, _ = seg.generate_gaussian_data(100)          # Generates 100 samples per Gaussian class
-    #X = np.round(X * 3)                             # Stretch and round the numbers
+    X, Y = seg.generate_gaussian_data(100)          # Generates 100 samples per Gaussian class
     D = scipy.spatial.distance.cdist(X, X, metric='euclidean')
     plt.imshow(D)
-
     #------------------------------------------------------------------#
 
 def small_samples_distance_test():
@@ -154,10 +152,12 @@ def small_samples_distance_test():
     # TODO: Generate a small sample Gaussian dataset X,
     #  create dataset C as per the instructions,
     #  and calculate and plot the distances between the datasets.
-    X, _ = seg.generate_gaussian_data(2)
+    X, Y = seg.generate_gaussian_data(2)
     C = np.array([[0, 0], [1, 1]])
     D = scipy.spatial.distance.cdist(X, C, metric='euclidean')
     plt.imshow(D)
+
+    return X, Y, C, D
     #------------------------------------------------------------------#
 
 def minimum_distance_test(X, Y, C, D):
@@ -166,16 +166,29 @@ def minimum_distance_test(X, Y, C, D):
     #  calculate the distances between the datasets,
     #  order the distances (min to max) using the provided code,
     #  calculate how many samples are closest to each of the samples in `C`
+
+    ax1=util.scatter_data(X,Y)
+    ax1.scatter(C[:,0], C[:,1], c='y')
+    plt.show()
+
+    min_index = np.argmin(D, axis=1)
+    min_dist = np.min(D, axis=1)
+    min_dist = np.asarray([min_dist])
+    min_dist = min_dist.T
+    print(min_dist)
     #------------------------------------------------------------------#
-    pass
 
 
 def distance_classification_test():
     #------------------------------------------------------------------#
     # TODO: Use the provided code to generate training and testing data
     #  Classify the points in test_data, based on their distances d to the points in train_data
+    train_data, train_labels = seg.generate_gaussian_data(2);
+    test_data, test_labels = seg.generate_gaussian_data(1);
+    D = scipy.spatial.distance.cdist(train_data, test_data, metric='euclidean')
+    print(D)
     #------------------------------------------------------------------#
-    pass
+
 
 def funX(X):
     return lambda w: seg.cost_kmeans(X,w)
@@ -264,8 +277,11 @@ def kmeans_demo():
 def kmeans_clustering_test():
     #------------------------------------------------------------------#
     #TODO: Store errors for training data
+    I = plt.imread('../data/dataset_brains/3_2_t1.tif')
+    test_data, _ = seg.normalize_data(I)
+    predicted_labels = seg.kmeans_clustering(test_data)
+    #plt.imshow(predicted_labels)
     #------------------------------------------------------------------#
-    pass
 
 def nn_classifier_test_samples():
 
@@ -722,3 +738,39 @@ def segmentation_combined_atlas_minmax_test():
     print('Error:\n{}'.format(err))
     dice = util.dice_overlap(test_labels, predicted_labels_max)
     print('Dice coefficient:\n{}'.format(dice))
+
+def initialize_cluster_centers(N=100, num_clusters=2):
+    # Generate 100 samples per Gaussian class
+    X, Y = seg.generate_gaussian_data(N)
+
+    # Select num_clusters rows from X and store in w_initial
+    start = np.random.randint(0,98)
+    n_cluster_rows = X[start:(start+num_clusters), :]
+    w_initial = np.array(n_cluster_rows)
+
+    ax1 = util.scatter_data(X, Y)
+    ax1.scatter(w_initial[:, 0], w_initial[:, 1], c='y')
+    plt.show()
+
+    return X, w_initial
+
+def exercise_1_4_B():
+    # For each row/sample in D, which column has the minimum value...
+    # (i.e. to which point in w_initial is this sample the closest)
+
+    X, w_initial = initialize_cluster_centers()
+    D = scipy.spatial.distance.cdist(X, w_initial, metric='euclidean')
+
+    min_index = np.argmin(D, axis=1)
+
+    # Calculate how many samples in X are closest to each of the samples in w_initial
+    class1 = []
+    class2 = []
+    for sample in min_index:
+        if sample == 0:
+            class1.append(sample)
+        if sample == 1:
+            class2.append(sample)
+
+    print("Amount of samples in class 1 = " + str(len(class1)))
+    print("Amount of samples in class 2 = " + str(len(class2)))

@@ -7,6 +7,7 @@ Segmentation module code for 8DC00 course
 import numpy as np
 import scipy
 from sklearn.neighbors import KNeighborsClassifier
+import segmentation_util as util
 
 
 # SECTION 1. Segmentation in feature space
@@ -124,8 +125,18 @@ def cost_kmeans(X, w_vector):
     # TODO: Find distance of each point to each cluster center
     # Then find the minimum distances min_dist and indices min_index
     # Then calculate the cost
+    D = scipy.spatial.distance.cdist(X, W, metric='euclidean')
+    min_dist = np.min(D, axis=1)
+    min_dist_row = np.asarray([min_dist])
+    min_dist_column = min_dist_row.T
+    print(min_dist_row)
+
+    J = min_dist_row.dot(min_dist_column)
+    J = (J/len(min_dist))[0][0]
+
     #------------------------------------------------------------------#
     return J
+
 
 
 def kmeans_clustering(test_data, K=2):
@@ -150,14 +161,22 @@ def kmeans_clustering(test_data, K=2):
 
     #------------------------------------------------------------------#
     # TODO: Initialize cluster centers and store them in w_initial
+    lengte = np.shape(test_data)
+    test_data_0 = np.nan_to_num(test_data)
+    start = np.random.randint(0, (lengte[0]-K))
+    n_cluster_rows = test_data_0[start:(start + K), :]
+    w_initial = np.array(n_cluster_rows)
+    # print("w_initial = " + str(w_initial))
+    # print(np.shape(w_initial))
     #------------------------------------------------------------------#
 
     #Reshape centers to a vector (needed by ngradient)
+    N, M = test_data_0.shape                                        #ZELF ER IN GEZET
     w_vector = w_initial.reshape(K*M, 1)
 
-    for i in np.arange(num_iter):
+    for i in np.arange(num_iter):                                   #deze i wordt nergens gebruikt, normaal?
         # gradient ascent
-        w_vector = w_vector - mu*reg.ngradient(fun,w_vector)
+        w_vector = w_vector - mu*util.ngradient(fun,w_vector)       #SEG.NGRADIENT VERVANGEN DOOR UTIL.NGRADIENT + BOVENIN import segmentation_util as util TOEGEVOEGD
 
     #Reshape back to dataset
     w_final = w_vector.reshape(K, M)
@@ -165,6 +184,14 @@ def kmeans_clustering(test_data, K=2):
     #------------------------------------------------------------------#
     # TODO: Find distance of each point to each cluster center
     # Then find the minimum distances min_dist and indices min_index
+    # D = scipy.spatial.distance.cdist(test_data_0, w_final, metric='euclidean')
+    # #print("D is" + str(D))
+    #
+    # min_dist = np.min(D, axis=1)
+    # min_dist = np.asarray([min_dist])
+    # min_dist = min_dist.T
+    #
+    # min_index = np.argmin(D, axis=1)
     #------------------------------------------------------------------#
 
     # Sort by intensity of cluster center
