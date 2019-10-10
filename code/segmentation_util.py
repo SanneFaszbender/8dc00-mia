@@ -198,6 +198,10 @@ def dice_overlap(true_labels, predicted_labels, smooth=1.):
 
     #------------------------------------------------------------------#
     # TODO: Implement the missing functionality for Dice overlap
+    noemer = (2*sum([1 if t[i]*p[i] == True else 0 for i in range(len(t))]))
+    teller = (sum(t.flatten())+sum(p.flatten()))
+    dice = noemer/teller
+
     #------------------------------------------------------------------#
     return dice
 
@@ -255,6 +259,7 @@ def classification_error(true_labels, predicted_labels):
 
     #------------------------------------------------------------------#
     # TODO: Implement the missing functionality for classification error
+    err = np.sum(t!=p)/len(t)
     #------------------------------------------------------------------#
     return err
 

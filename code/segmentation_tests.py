@@ -183,10 +183,19 @@ def distance_classification_test():
     #------------------------------------------------------------------#
     # TODO: Use the provided code to generate training and testing data
     #  Classify the points in test_data, based on their distances d to the points in train_data
-    train_data, train_labels = seg.generate_gaussian_data(2);
-    test_data, test_labels = seg.generate_gaussian_data(1);
-    D = scipy.spatial.distance.cdist(train_data, test_data, metric='euclidean')
-    print(D)
+    train_data, train_labels = seg.generate_gaussian_data(2)
+    test_data, test_labels = seg.generate_gaussian_data(1)
+
+    d = scipy.spatial.distance.cdist(test_data, train_data, metric='euclidean')
+    min_index = np.argmin(d, axis=1)
+    print(d)
+
+    predicted_labels = np.zeros([test_data.shape[0], 1])
+
+    for i in range(predicted_labels.shape[0]):
+        predicted_labels[i] = train_labels[min_index[i]]
+
+    return predicted_labels
     #------------------------------------------------------------------#
 
 
@@ -277,10 +286,15 @@ def kmeans_demo():
 def kmeans_clustering_test():
     #------------------------------------------------------------------#
     #TODO: Store errors for training data
-    I = plt.imread('../data/dataset_brains/3_2_t1.tif')
-    test_data, _ = seg.normalize_data(I)
+    X, Y = scatter_data_test(showFigs=False)
+
+    I = plt.imread('../data/dataset_brains/1_1_t1.tif')
+    c, coord_im = seg.extract_coordinate_feature(I)
+    X_data = np.concatenate((X,c), axis=1)
+    test_data, _ = seg.normalize_data(X_data)
     predicted_labels = seg.kmeans_clustering(test_data)
-    #plt.imshow(predicted_labels)
+    predicted_labels = predicted_labels.reshape(I.shape)
+    plt.imshow(predicted_labels)
     #------------------------------------------------------------------#
 
 def nn_classifier_test_samples():
@@ -305,21 +319,28 @@ def generate_train_test(N, task):
     #
     # Input:
     #
-    # N             - Number of samples per classs
+    # N             - Number of samples per class
     # task          - String, either 'easy' or 'hard'
 
     if task == 'easy':
         #-------------------------------------------------------------------#
         #TODO: modify these values to create an easy train/test dataset pair
+        mu1 = [0, 0]
+        mu2 = [3, 3]
+        sigma1 = [[1, 0], [0, 1]]
+        sigma2 = [[1, 0], [0, 1]]
         #-------------------------------------------------------------------#
-        pass
 
 
     if task == 'hard':
         #-------------------------------------------------------------------#
         #TODO: modify these values to create an difficult train/test dataset pair
+        mu1 = [0, 0]
+        mu2 = [1, 1]
+        sigma1 = [[7, 0], [0, 7]]
+        sigma2 = [[7, 0], [0, 7]]
         #-------------------------------------------------------------------#
-        pass
+
 
     trainX, trainY = seg.generate_gaussian_data(N, mu1, mu2, sigma1, sigma2)
     testX, testY = seg.generate_gaussian_data(N, mu1, mu2, sigma1, sigma2)
@@ -331,8 +352,18 @@ def easy_hard_data_classifier_test():
     #-------------------------------------------------------------------#
     #TODO: generate and classify (using nn_classifier) 2 pairs of datasets (easy and hard)
     # calculate classification error in each case
+    trainXeasy, trainYeasy, testXeasy, testYeasy = generate_train_test(2, 'easy')
+    trainXhard, trainYhard, testXhard, testYhard = generate_train_test(2, 'hard')
+
+    predicted_labels_easy = seg.nn_classifier(trainXeasy, trainYeasy, testXeasy)
+    predicted_labels_hard = seg.nn_classifier(trainXhard, trainYhard, testXhard)
+
+    err_easy = util.classification_error(testYeasy,predicted_labels_easy)
+    print(err_easy)
+    err_hard = util.classification_error(testYhard,predicted_labels_hard)
+    print(err_hard)
     #-------------------------------------------------------------------#
-    pass
+
 
 def nn_classifier_test_brains(testDice=False):
 

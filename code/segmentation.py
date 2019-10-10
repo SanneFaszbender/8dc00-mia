@@ -129,11 +129,11 @@ def cost_kmeans(X, w_vector):
     min_dist = np.min(D, axis=1)
     min_dist_row = np.asarray([min_dist])
     min_dist_column = min_dist_row.T
-    print(min_dist_row)
+    # print(min_dist_row.shape)
+    # print(D.shape)
 
     J = min_dist_row.dot(min_dist_column)
     J = (J/len(min_dist))[0][0]
-
     #------------------------------------------------------------------#
     return J
 
@@ -161,22 +161,26 @@ def kmeans_clustering(test_data, K=2):
 
     #------------------------------------------------------------------#
     # TODO: Initialize cluster centers and store them in w_initial
-    lengte = np.shape(test_data)
-    test_data_0 = np.nan_to_num(test_data)
-    start = np.random.randint(0, (lengte[0]-K))
-    n_cluster_rows = test_data_0[start:(start + K), :]
-    w_initial = np.array(n_cluster_rows)
+    N, M = test_data.shape
+    idx = np.random.randint(N, size=K)
+    w_initial = test_data[idx, :]
+
+    # lengte = np.shape(test_data)
+    # test_data_0 = np.nan_to_num(test_data)
+    # start = np.random.randint(0, (lengte[0]-K))
+    # n_cluster_rows = test_data_0[start:(start + K), :]
+    # w_initial = np.array(n_cluster_rows)
     # print("w_initial = " + str(w_initial))
     # print(np.shape(w_initial))
     #------------------------------------------------------------------#
 
     #Reshape centers to a vector (needed by ngradient)
-    N, M = test_data_0.shape                                        #ZELF ER IN GEZET
     w_vector = w_initial.reshape(K*M, 1)
 
-    for i in np.arange(num_iter):                                   #deze i wordt nergens gebruikt, normaal?
+    for i in np.arange(num_iter):               #deze i wordt nergens gebruikt, normaal?
         # gradient ascent
-        w_vector = w_vector - mu*util.ngradient(fun,w_vector)       #SEG.NGRADIENT VERVANGEN DOOR UTIL.NGRADIENT + BOVENIN import segmentation_util as util TOEGEVOEGD
+        #g = util.ngradient(fun,w_vector)        #toegevoegd
+        w_vector = w_vector - mu*util.ngradient(fun,w_vector)           #g.T was eerst util.ngradient(fun,w_vector)
 
     #Reshape back to dataset
     w_final = w_vector.reshape(K, M)
@@ -184,14 +188,12 @@ def kmeans_clustering(test_data, K=2):
     #------------------------------------------------------------------#
     # TODO: Find distance of each point to each cluster center
     # Then find the minimum distances min_dist and indices min_index
-    # D = scipy.spatial.distance.cdist(test_data_0, w_final, metric='euclidean')
-    # #print("D is" + str(D))
-    #
-    # min_dist = np.min(D, axis=1)
-    # min_dist = np.asarray([min_dist])
-    # min_dist = min_dist.T
-    #
-    # min_index = np.argmin(D, axis=1)
+
+    D = scipy.spatial.distance.cdist(test_data, w_final, metric='euclidean')
+    min_index = np.argmin(D, axis=1)
+    min_dist = np.zeros((len(min_index),1))
+    for i in range(len(min_index)):
+        min_dist[i,0] = D.item((i,min_index[i]))
     #------------------------------------------------------------------#
 
     # Sort by intensity of cluster center
@@ -215,15 +217,21 @@ def nn_classifier(train_data, train_labels, test_data):
     # Input:
     # train_data        num_train x p matrix with features for the training data
     # train_labels      num_train x 1 vector with labels for the training data
-    # test_labels       num_test x p matrix with features for the test data
+    # test_data         num_test x p matrix with features for the test data
     #
     # Output:
     # predicted_labels   num_test x 1 predicted vector with labels for the test data
 
     #------------------------------------------------------------------#
     # TODO: Implement missing functionality
-    #------------------------------------------------------------------#
+    d = scipy.spatial.distance.cdist(test_data, train_data, metric='euclidean')
+    min_index = np.argmin(d, axis=1)
 
+    predicted_labels = np.zeros([test_data.shape[0],1])
+
+    for i in range(predicted_labels.shape[0]):
+        predicted_labels[i] = train_labels[min_index[i]]
+    #------------------------------------------------------------------#
 
     return predicted_labels
     
@@ -238,16 +246,16 @@ def knn_classifier(train_data, train_labels, test_data, k):
     # k - Number of neighbors to take into account (1 by default)
     # Output:
     # predicted_labels - num_test x 1 predicted vector with labels for the test data
-    
+
+    #------------------------------------------------------------#
     D = scipy.spatial.distance.cdist(test_data, train_data, metric='euclidean')
     sort_ix = np.argsort(D, axis=1)
-    sort_ix_k = sort_ix[:,:k] # Get the k smallest distances
+    sort_ix_k = sort_ix[:, :k]  # Get the k smallest distances
     predicted_labels = train_labels[sort_ix_k]
     predicted_labels = scipy.stats.mode(predicted_labels, axis=1)[0]
+    #-------------------------------------------------------------#
 
     return predicted_labels
-
-
 
 # SECTION 2. Generalization and overfitting
 
