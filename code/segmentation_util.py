@@ -5,6 +5,7 @@ Utility functions for segmentation.
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from scipy import ndimage
 
 def ngradient(fun, x, h=1e-3):
     # Computes the derivative of a function with numerical differentiation.
@@ -112,9 +113,16 @@ def extract_features(image_number, slice_number):
     t1 = plt.imread(base_dir + str(image_number) + '_' + str(slice_number) + '_t1.tif')
     t2 = plt.imread(base_dir + str(image_number) + '_' + str(slice_number) + '_t2.tif')
 
+    fig = plt.figure(figsize=(10,10))
+    ax1  = fig.add_subplot(181)
+    ax1.imshow(t1)
+    ax2  = fig.add_subplot(182)
+    ax2.imshow(t2)
+    
     n = t1.shape[0]
     features = ()
-
+    
+    #display image
     t1f = t1.flatten().T.astype(float)
     t1f = t1f.reshape(-1, 1)
     t2f = t2.flatten().T.astype(float)
@@ -128,8 +136,69 @@ def extract_features(image_number, slice_number):
     #------------------------------------------------------------------#
     # TODO: Extract more features and add them to X.
     # Don't forget to provide (short) descriptions for the features
+    
+    #add blurred images to features
+    t1b = ndimage.gaussian_filter(t1, sigma=2) #blurred t1
+    t2b = ndimage.gaussian_filter(t2, sigma=2) #blurred t2
+    
+    #display altered images
+    ax3 = fig.add_subplot(183)
+    ax3.imshow(t1b)
+    ax4 = fig.add_subplot(184)
+    ax4.imshow(t2b)
+    
+    t1b = t1b.flatten().T.astype(float)
+    t1b = t1b.reshape(-1, 1)
+    t2b = t2b.flatten().T.astype(float)
+    t2b = t2b.reshape(-1, 1)
+
+    X = np.concatenate((X, t1b), axis=1)
+    X = np.concatenate((X, t2b), axis=1)
+    
+    features += ('T1 blurred intensity',)
+    features += ('T2 blurred intensity',)
+    
+    #minimum filter
+    t1min = ndimage.minimum_filter(t1, size=10)
+    t2min = ndimage.minimum_filter(t2, size=10)
+    
+    ax5 = fig.add_subplot(185)
+    ax5.imshow(t1min)
+    ax6 = fig.add_subplot(186)
+    ax6.imshow(t2min)
+    
+    t1min = t1min.flatten().T.astype(float)
+    t1min = t1min.reshape(-1, 1)
+    t2min = t2min.flatten().T.astype(float)
+    t2min = t2min.reshape(-1, 1)
+
+    X = np.concatenate((X, t1min), axis=1)
+    X = np.concatenate((X, t2min), axis=1)
+    
+    features += ('T1 minimum filter',)
+    features += ('T2 minimum filter',)
+    
+    #maximum filter
+    t1max = ndimage.maximum_filter(t1, size=10)
+    t2max = ndimage.maximum_filter(t2, size=10)
+    
+    ax5 = fig.add_subplot(187)
+    ax5.imshow(t1max)
+    ax6 = fig.add_subplot(188)
+    ax6.imshow(t2max)
+    
+    t1max = t1max.flatten().T.astype(float)
+    t1max = t1max.reshape(-1, 1)
+    t2max = t2max.flatten().T.astype(float)
+    t2max = t2max.reshape(-1, 1)
+
+    X = np.concatenate((X, t1max), axis=1)
+    X = np.concatenate((X, t2max), axis=1)
+    
+    features += ('T1 maximum filter',)
+    features += ('T2 maximum filter',)
     #------------------------------------------------------------------#
-    return X, features
+    #return X, features
 
 
 def create_labels(image_number, slice_number, task):
