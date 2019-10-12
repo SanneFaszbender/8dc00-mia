@@ -27,7 +27,7 @@ def scatter_data_test(showFigs=True):
     gt_mask = GT>0
     Y = gt_mask.flatten() # labels
 
-    I_blurred = ndimage.gaussian_filter(I, sigma=5)
+    I_blurred = ndimage.gaussian_filter(I, sigma=2)
     X2 = I_blurred.flatten().T
     X2 = X2.reshape(-1, 1)
 
@@ -38,6 +38,22 @@ def scatter_data_test(showFigs=True):
 
     #------------------------------------------------------------------#
     # TODO: Implement a few test cases of with different features
+    I_blurred = ndimage.gaussian_filter(I, sigma=5)     #nieuwe feature gemaakt door andere sigma in gaussische filter te gebruiken
+    X3 = I_blurred.flatten().T
+    X3 = X3.reshape(-1, 1)
+
+    I_blurred = ndimage.gaussian_filter(I, sigma=10)
+    X4 = I_blurred.flatten().T
+    X4 = X4.reshape(-1, 1)
+
+    X_data = np.concatenate((X_data, X3), axis=1)
+    X_data = np.concatenate((X_data, X4), axis=1)
+
+
+    if showFigs:
+        util.scatter_data(X_data,Y, 1, 2)           #plot feature 2 tegen 3
+        util.scatter_data(X_data, Y, 2, 3)          #plot feature 3 tegen 4
+
     #------------------------------------------------------------------#
     return X_data, Y
 
@@ -66,20 +82,16 @@ def scatter_t2_test(showFigs=True):
 
     #------------------------------------------------------------------#
     # TODO: Extract features from the T2 image and compare them to the T1 features
-    I3 = plt.imread('../data/dataset_brains/1_1_t2.tif')
-    I3 = ndimage.gaussian_filter(I3, sigma=2)
-    X3 = I3.flatten().T
-    X3 = X3.reshape(-1,1)
-
-    X_data_1 = np.concatenate((X1, X2, X3), axis=1)
-
-    if showFigs:
-        util.scatter_data(X_data_1,Y,1,2)
+    I2_blurred = ndimage.gaussian_filter(I2, sigma=4)       #I2 normal intensity is al berekend, dit berekend I2_blurred
+    X22 = I2_blurred.flatten().T
+    X22 = X12.reshape(-1, 1)
+    X_data = np.concatenate((X_data, X2), axis=1)
+    X_data = np.concatenate((X_data, X22), axis=1)
 
     if showFigs:
-        util.scatter_data(X_data_1,Y,0,1)
+        util.scatter_data(X_data,Y,2,3)                     #Plot normal intensities tegen blurred intensities van I2
     #------------------------------------------------------------------#
-    return X_data_1, Y
+    return X_data, Y
 
 
 def extract_coordinate_feature_test():
@@ -99,6 +111,12 @@ def feature_stats_test():
     X_data = np.concatenate((X, c), axis=1)
     #------------------------------------------------------------------#
     # TODO: Write code to examine the mean and standard deviation of your dataset containing variety of features
+    mean = np.mean(X_data, axis=0)       #berekent mean per rij
+    standard_deviation = np.std(X_data, axis=0)
+
+    print("Mean is" + str(mean))
+    print("Std is" + str(standard_deviation))
+    # print(X_data)
     #------------------------------------------------------------------#
 
 
@@ -110,6 +128,13 @@ def normalized_stats_test():
     #------------------------------------------------------------------#
     # TODO: Write code to normalize your dataset containing variety of features,
     #  then examine the mean and std dev
+
+    normdata, _ = seg.normalize_data(X_data)        #output van def normalize_data is 2 variables
+
+    mean = np.mean(normdata, axis=0)
+    standard_deviation = np.std(normdata, axis=0)
+    print("Mean is" + str(mean))
+    print("Std is" + str(standard_deviation))
     #------------------------------------------------------------------#
 
 
@@ -117,16 +142,23 @@ def distance_test():
     #------------------------------------------------------------------#
     # TODO: Generate a Gaussian dataset, with 100 samples per class, and compute the distances.
     #  Use plt.imshow() to visualize the distance matrix as an image.
+    X, Y = seg.generate_gaussian_data(100)          # Generates 100 samples per Gaussian class
+    D = scipy.spatial.distance.cdist(X, X, metric='euclidean')
+    plt.imshow(D)
     #------------------------------------------------------------------#
-    pass
 
 def small_samples_distance_test():
     #------------------------------------------------------------------#
     # TODO: Generate a small sample Gaussian dataset X,
     #  create dataset C as per the instructions,
     #  and calculate and plot the distances between the datasets.
+    X, Y = seg.generate_gaussian_data(2)
+    C = np.array([[0, 0], [1, 1]])
+    D = scipy.spatial.distance.cdist(X, C, metric='euclidean')
+    plt.imshow(D)
+
+    return X, Y, C, D
     #------------------------------------------------------------------#
-    pass
 
 def minimum_distance_test(X, Y, C, D):
     #------------------------------------------------------------------#
@@ -134,16 +166,38 @@ def minimum_distance_test(X, Y, C, D):
     #  calculate the distances between the datasets,
     #  order the distances (min to max) using the provided code,
     #  calculate how many samples are closest to each of the samples in `C`
+
+    ax1=util.scatter_data(X,Y)
+    ax1.scatter(C[:,0], C[:,1], c='y')
+    plt.show()
+
+    min_index = np.argmin(D, axis=1)
+    min_dist = np.min(D, axis=1)
+    min_dist = np.asarray([min_dist])
+    min_dist = min_dist.T
+    print(min_dist)
     #------------------------------------------------------------------#
-    pass
 
 
 def distance_classification_test():
     #------------------------------------------------------------------#
     # TODO: Use the provided code to generate training and testing data
     #  Classify the points in test_data, based on their distances d to the points in train_data
+    train_data, train_labels = seg.generate_gaussian_data(2)
+    test_data, test_labels = seg.generate_gaussian_data(1)
+
+    d = scipy.spatial.distance.cdist(test_data, train_data, metric='euclidean')
+    min_index = np.argmin(d, axis=1)
+    print(d)
+
+    predicted_labels = np.zeros([test_data.shape[0], 1])
+
+    for i in range(predicted_labels.shape[0]):
+        predicted_labels[i] = train_labels[min_index[i]]
+
+    return predicted_labels
     #------------------------------------------------------------------#
-    pass
+
 
 def funX(X):
     return lambda w: seg.cost_kmeans(X,w)
@@ -232,8 +286,16 @@ def kmeans_demo():
 def kmeans_clustering_test():
     #------------------------------------------------------------------#
     #TODO: Store errors for training data
+    X, Y = scatter_data_test(showFigs=False)
+
+    I = plt.imread('../data/dataset_brains/1_1_t1.tif')
+    c, coord_im = seg.extract_coordinate_feature(I)
+    X_data = np.concatenate((X,c), axis=1)
+    test_data, _ = seg.normalize_data(X_data)
+    predicted_labels = seg.kmeans_clustering(test_data)
+    predicted_labels = predicted_labels.reshape(I.shape)
+    plt.imshow(predicted_labels)
     #------------------------------------------------------------------#
-    pass
 
 def nn_classifier_test_samples():
 
@@ -257,21 +319,28 @@ def generate_train_test(N, task):
     #
     # Input:
     #
-    # N             - Number of samples per classs
+    # N             - Number of samples per class
     # task          - String, either 'easy' or 'hard'
 
     if task == 'easy':
         #-------------------------------------------------------------------#
         #TODO: modify these values to create an easy train/test dataset pair
+        mu1 = [0, 0]
+        mu2 = [3, 3]
+        sigma1 = [[1, 0], [0, 1]]
+        sigma2 = [[1, 0], [0, 1]]
         #-------------------------------------------------------------------#
-        pass
 
 
     if task == 'hard':
         #-------------------------------------------------------------------#
         #TODO: modify these values to create an difficult train/test dataset pair
+        mu1 = [0, 0]
+        mu2 = [1, 1]
+        sigma1 = [[7, 0], [0, 7]]
+        sigma2 = [[7, 0], [0, 7]]
         #-------------------------------------------------------------------#
-        pass
+
 
     trainX, trainY = seg.generate_gaussian_data(N, mu1, mu2, sigma1, sigma2)
     testX, testY = seg.generate_gaussian_data(N, mu1, mu2, sigma1, sigma2)
@@ -283,8 +352,18 @@ def easy_hard_data_classifier_test():
     #-------------------------------------------------------------------#
     #TODO: generate and classify (using nn_classifier) 2 pairs of datasets (easy and hard)
     # calculate classification error in each case
+    trainXeasy, trainYeasy, testXeasy, testYeasy = generate_train_test(2, 'easy')
+    trainXhard, trainYhard, testXhard, testYhard = generate_train_test(2, 'hard')
+
+    predicted_labels_easy = seg.nn_classifier(trainXeasy, trainYeasy, testXeasy)
+    predicted_labels_hard = seg.nn_classifier(trainXhard, trainYhard, testXhard)
+
+    err_easy = util.classification_error(testYeasy,predicted_labels_easy)
+    print(err_easy)
+    err_hard = util.classification_error(testYhard,predicted_labels_hard)
+    print(err_hard)
     #-------------------------------------------------------------------#
-    pass
+
 
 def nn_classifier_test_brains(testDice=False):
 
@@ -690,3 +769,39 @@ def segmentation_combined_atlas_minmax_test():
     print('Error:\n{}'.format(err))
     dice = util.dice_overlap(test_labels, predicted_labels_max)
     print('Dice coefficient:\n{}'.format(dice))
+
+def initialize_cluster_centers(N=100, num_clusters=2):
+    # Generate 100 samples per Gaussian class
+    X, Y = seg.generate_gaussian_data(N)
+
+    # Select num_clusters rows from X and store in w_initial
+    start = np.random.randint(0,98)
+    n_cluster_rows = X[start:(start+num_clusters), :]
+    w_initial = np.array(n_cluster_rows)
+
+    ax1 = util.scatter_data(X, Y)
+    ax1.scatter(w_initial[:, 0], w_initial[:, 1], c='y')
+    plt.show()
+
+    return X, w_initial
+
+def exercise_1_4_B():
+    # For each row/sample in D, which column has the minimum value...
+    # (i.e. to which point in w_initial is this sample the closest)
+
+    X, w_initial = initialize_cluster_centers()
+    D = scipy.spatial.distance.cdist(X, w_initial, metric='euclidean')
+
+    min_index = np.argmin(D, axis=1)
+
+    # Calculate how many samples in X are closest to each of the samples in w_initial
+    class1 = []
+    class2 = []
+    for sample in min_index:
+        if sample == 0:
+            class1.append(sample)
+        if sample == 1:
+            class2.append(sample)
+
+    print("Amount of samples in class 1 = " + str(len(class1)))
+    print("Amount of samples in class 2 = " + str(len(class2)))
