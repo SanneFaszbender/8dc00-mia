@@ -322,7 +322,7 @@ def extract_features(image_number, slice_number):
     features += ('T2 prewitt filter',)
 
     #------------------------------------------------------------------#
-    #return X, features
+    return X, features
 
 
 def create_labels(image_number, slice_number, task):
@@ -352,15 +352,19 @@ def create_labels(image_number, slice_number, task):
     base_dir = '../data/dataset_brains/'
 
     I = plt.imread(base_dir + str(image_number) + '_' + str(slice_number) + '_gt.tif')
-
-    if task == 'brain':
+    
+    I=I.flatten().T
+    I=I.reshape(-1,1)
+    Y=I
+    
+    if task == 'tissue':
         Y = I>0
     elif task == 'brain':
-        white_matter = I == 2 | I == 5
-        gray_matter  = I == 7 | I == 3
-        csf         = I == 4 | I == 8
-        background  = I == 0 |  I == 1 | I == 6
-        Y = I
+        white_matter = (I == 2) | (I == 5)
+        gray_matter  = (I == 7) | (I == 3)
+        csf         = (I == 4) | (I == 8)
+        background  = (I == 0) |  (I == 1) | (I == 6)
+
         Y[background] = 0
         Y[white_matter] = 1
         Y[gray_matter] = 2
@@ -371,6 +375,7 @@ def create_labels(image_number, slice_number, task):
 
     Y = Y.flatten().T
     Y = Y.reshape(-1,1)
+    #print(Y)
 
     return Y
 
