@@ -182,10 +182,10 @@ def extract_features(image_number, slice_number):
     t1max = ndimage.maximum_filter(t1, size=10)
     t2max = ndimage.maximum_filter(t2, size=10)
     
-    ax5 = fig.add_subplot(187)
-    ax5.imshow(t1max)
-    ax6 = fig.add_subplot(188)
-    ax6.imshow(t2max)
+    ax7 = fig.add_subplot(187)
+    ax7.imshow(t1max)
+    ax8 = fig.add_subplot(188)
+    ax8.imshow(t2max)
     
     t1max = t1max.flatten().T.astype(float)
     t1max = t1max.reshape(-1, 1)
@@ -197,6 +197,130 @@ def extract_features(image_number, slice_number):
     
     features += ('T1 maximum filter',)
     features += ('T2 maximum filter',)
+
+    #gaussian gradient magnitude
+    t1_ggm = ndimage.gaussian_gradient_magnitude(t1, sigma=5)
+    t2_ggm = ndimage.gaussian_gradient_magnitude(t2, sigma=5)
+
+    fig1 = plt.figure(figsize=(10, 10))
+    ax9 = fig1.add_subplot(181)
+    ax9.imshow(t1_ggm)
+    ax10 = fig1.add_subplot(182)
+    ax10.imshow(t2_ggm)
+
+    t1_ggm = t1_ggm.flatten().T.astype(float)
+    t1_ggm = t1_ggm.reshape(-1, 1)
+    t2_ggm = t2_ggm.flatten().T.astype(float)
+    t2_ggm = t2_ggm.reshape(-1, 1)
+
+    X = np.concatenate((X, t1_ggm), axis=1)
+    X = np.concatenate((X, t2_ggm), axis=1)
+
+    features += ('T1 gaussian gradient magnitude filter',)
+    features += ('T2 gaussian gradient magnitude filter',)
+
+    #gaussian la place (second derivative)
+    t1_glp = ndimage.gaussian_laplace(t1, sigma=1)
+    t2_glp = ndimage.gaussian_laplace(t2, sigma=1)
+
+    ax11 = fig1.add_subplot(183)
+    ax11.imshow(t1_glp)
+    ax12 = fig1.add_subplot(184)
+    ax12.imshow(t2_glp)
+
+    t1_glp = t1_glp.flatten().T.astype(float)
+    t1_glp = t1_glp.reshape(-1, 1)
+    t2_glp = t2_glp.flatten().T.astype(float)
+    t2_glp = t2_glp.reshape(-1, 1)
+
+    X = np.concatenate((X, t1_glp), axis=1)
+    X = np.concatenate((X, t2_glp), axis=1)
+
+    features += ('T1 gaussian la place filter',)
+    features += ('T2 gaussian la place filter',)
+
+    #median filter (smoothning filter)
+    t1_median = ndimage.median_filter(t1, size=15)
+    t2_median = ndimage.median_filter(t2, size=15)
+
+    ax13 = fig1.add_subplot(185)
+    ax13.imshow(t1_median)
+    ax14 = fig1.add_subplot(186)
+    ax14.imshow(t2_median)
+
+    t1_median = t1_median.flatten().T.astype(float)
+    t1_median = t1_median.reshape(-1, 1)
+    t2_median = t2_median.flatten().T.astype(float)
+    t2_median = t2_median.reshape(-1, 1)
+
+    X = np.concatenate((X, t1_median), axis=1)
+    X = np.concatenate((X, t2_median), axis=1)
+
+    features += ('T1 median filter',)
+    features += ('T2 median filter',)
+
+    #sobel filter (edge detection, derivative filter, horizontal/vertical lines, some smoothning)
+    t1_sobel = ndimage.sobel(t1)
+    t2_sobel = ndimage.sobel(t2)
+
+    ax15 = fig1.add_subplot(187)
+    ax15.imshow(t1_sobel)
+    ax16 = fig1.add_subplot(188)
+    ax16.imshow(t2_sobel)
+
+    t1_sobel = t1_sobel.flatten().T.astype(float)
+    t1_sobel = t1_sobel.reshape(-1, 1)
+    t2_sobel = t2_sobel.flatten().T.astype(float)
+    t2_sobel = t2_sobel.reshape(-1, 1)
+
+    X = np.concatenate((X, t1_sobel), axis=1)
+    X = np.concatenate((X, t2_sobel), axis=1)
+
+    features += ('T1 sobel filter',)
+    features += ('T2 sobel filter',)
+
+    # rank filter (smoothning filter)
+    t1_rank = ndimage.rank_filter(t1, rank=30, size=20)
+    t2_rank = ndimage.rank_filter(t2, rank=30, size=20)
+
+    fig2 = plt.figure(figsize=(10,10))
+    ax17 = fig2.add_subplot(181)
+    ax17.imshow(t1_rank)
+    ax18 = fig2.add_subplot(182)
+    ax18.imshow(t2_rank)
+
+    t1_rank = t1_rank.flatten().T.astype(float)
+    t1_rank = t1_rank.reshape(-1, 1)
+    t2_rank = t2_rank.flatten().T.astype(float)
+    t2_rank = t2_rank.reshape(-1, 1)
+
+    X = np.concatenate((X, t1_sobel), axis=1)
+    X = np.concatenate((X, t2_sobel), axis=1)
+
+    features += ('T1 rank filter',)
+    features += ('T2 rank filter',)
+
+    # prewitt filter (edge detection, derivative filter, horizontal/vertical lines, some smoothning)
+    # looks like sobel filter but has different kernel, only horizonal or vertical lines
+    t1_prewitt = ndimage.prewitt(t1)
+    t2_prewitt = ndimage.prewitt(t2)
+
+    ax19 = fig2.add_subplot(183)
+    ax19.imshow(t1_prewitt)
+    ax20 = fig2.add_subplot(184)
+    ax20.imshow(t2_prewitt)
+
+    t1_prewitt = t1_prewitt.flatten().T.astype(float)
+    t1_prewitt = t1_prewitt.reshape(-1, 1)
+    t2_prewitt = t2_prewitt.flatten().T.astype(float)
+    t2_prewitt = t2_prewitt.reshape(-1, 1)
+
+    X = np.concatenate((X, t1_prewitt), axis=1)
+    X = np.concatenate((X, t2_prewitt), axis=1)
+
+    features += ('T1 prewitt filter',)
+    features += ('T2 prewitt filter',)
+
     #------------------------------------------------------------------#
     #return X, features
 
