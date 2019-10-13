@@ -55,7 +55,7 @@ def ngradient(fun, x, h=1e-3):
     return g
 
 def scatter_data(X, Y, feature0=0, feature1=1, ax=None):
-    # scater_data displays a scatterplot of at most 1000 samples from dataset X, and gives each point
+    # scatter_data displays a scatterplot of at most 1000 samples from dataset X, and gives each point
     # a different color based on its label in Y
 
     k = 1000
@@ -76,6 +76,7 @@ def scatter_data(X, Y, feature0=0, feature1=1, ax=None):
         lbl = 'X, class '+str(i)
         ax.scatter(X[idx2,feature0], X[idx2,feature1], color=c, label=lbl)
 
+    ax.legend()
     return ax
 
 
