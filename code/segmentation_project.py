@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 import segmentation as seg
 
 
-def segmentation_mymethod(train_data_matrix, train_labels_matrix, test_data, task='brain'):
+#def segmentation_mymethod(train_data_matrix, train_labels_matrix, test_data, task='brain'):
+def segmentation_mymethod(train_data, train_labels, test_data, test_labels, task = 'brain', method = 'nearest neighbour', testDice = True):
     # segments the image based on your own method!
     # Input:
     # train_data_matrix   num_pixels x num_features x num_subjects matrix of
@@ -25,6 +26,24 @@ def segmentation_mymethod(train_data_matrix, train_labels_matrix, test_data, tas
 
     #------------------------------------------------------------------#
     #TODO: Implement your method here
+    if method == 'kmeans':
+        predicted_labels = seg.kmeans_clustering(test_data, K=4)
+    elif method == 'nearest neighbour':
+        predicted_labels = seg.nn_classifier(train_data, train_labels, test_data)
+    elif method == 'knn':
+        predicted_labels = seg.knn_classifier(train_data, train_labels, test_data, k=4)
+    elif method == 'atlas':
+        predicted_labels = seg.segmentation_atlas(train_data, train_labels, test_data)
+
+    predicted_labels = predicted_labels.astype(bool)
+    test_labels = test_labels.astype(bool)
+
+    err = util.classification_error(test_labels, predicted_labels)
+    print('Error:\n{}'.format(err))
+
+    if testDice:
+        dice = util.dice_multiclass(test_labels, predicted_labels)
+        print('Dice coefficient:\n{}'.format(dice))
     #------------------------------------------------------------------#
     return predicted_labels
 
@@ -130,3 +149,4 @@ def segmentation_demo():
         text_str = 'Err {:.4f}, dice {:.4f}'.format(all_errors[i,2], all_dice[i,2])
         ax3.set_xlabel(text_str)
         ax3.set_title('Subject {}: My method'.format(sub))
+
