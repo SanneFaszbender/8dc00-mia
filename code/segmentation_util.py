@@ -76,7 +76,7 @@ def scatter_data(X, Y, feature0=0, feature1=1, ax=None):
         lbl = 'X, class '+str(i)
         ax.scatter(X[idx2,feature0], X[idx2,feature1], color=c, label=lbl)
 
-    ax.legend()
+
     return ax
 
 
@@ -160,8 +160,8 @@ def extract_features(image_number, slice_number):
     features += ('T2 blurred intensity',)
     
     #minimum filter
-    t1min = ndimage.minimum_filter(t1, size=10)
-    t2min = ndimage.minimum_filter(t2, size=10)
+    t1min = ndimage.minimum_filter(t1, size=5)
+    t2min = ndimage.minimum_filter(t2, size=5)
     
     ax5 = fig.add_subplot(185)
     ax5.imshow(t1min)
@@ -176,12 +176,12 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1min), axis=1)
     X = np.concatenate((X, t2min), axis=1)
     
-    features += ('T1 minimum filter',)
-    features += ('T2 minimum filter',)
+    features += ('T1 minimum intensity',)
+    features += ('T2 minimum intensity',)
     
     #maximum filter
-    t1max = ndimage.maximum_filter(t1, size=10)
-    t2max = ndimage.maximum_filter(t2, size=10)
+    t1max = ndimage.maximum_filter(t1, size=5)
+    t2max = ndimage.maximum_filter(t2, size=5)
     
     ax7 = fig.add_subplot(187)
     ax7.imshow(t1max)
@@ -196,12 +196,12 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1max), axis=1)
     X = np.concatenate((X, t2max), axis=1)
     
-    features += ('T1 maximum filter',)
-    features += ('T2 maximum filter',)
+    features += ('T1 maximum intensity',)
+    features += ('T2 maximum intensity',)
 
     #gaussian gradient magnitude
-    t1_ggm = ndimage.gaussian_gradient_magnitude(t1, sigma=5)
-    t2_ggm = ndimage.gaussian_gradient_magnitude(t2, sigma=5)
+    t1_ggm = ndimage.gaussian_gradient_magnitude(t1, sigma=2)
+    t2_ggm = ndimage.gaussian_gradient_magnitude(t2, sigma=2)
 
     fig1 = plt.figure(figsize=(10, 10))
     ax9 = fig1.add_subplot(181)
@@ -217,8 +217,8 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1_ggm), axis=1)
     X = np.concatenate((X, t2_ggm), axis=1)
 
-    features += ('T1 gaussian gradient magnitude filter',)
-    features += ('T2 gaussian gradient magnitude filter',)
+    features += ('T1 gaussian gradient magnitude intensity',)
+    features += ('T2 gaussian gradient magnitude intensity',)
 
     #gaussian la place (second derivative)
     t1_glp = ndimage.gaussian_laplace(t1, sigma=1)
@@ -237,12 +237,12 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1_glp), axis=1)
     X = np.concatenate((X, t2_glp), axis=1)
 
-    features += ('T1 gaussian la place filter',)
-    features += ('T2 gaussian la place filter',)
+    features += ('T1 gaussian la place intensity',)
+    features += ('T2 gaussian la place intensity',)
 
     #median filter (smoothning filter)
-    t1_median = ndimage.median_filter(t1, size=15)
-    t2_median = ndimage.median_filter(t2, size=15)
+    t1_median = ndimage.median_filter(t1, size=5)
+    t2_median = ndimage.median_filter(t2, size=5)
 
     ax13 = fig1.add_subplot(185)
     ax13.imshow(t1_median)
@@ -257,8 +257,8 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1_median), axis=1)
     X = np.concatenate((X, t2_median), axis=1)
 
-    features += ('T1 median filter',)
-    features += ('T2 median filter',)
+    features += ('T1 median intensity',)
+    features += ('T2 median intensity',)
 
     #sobel filter (edge detection, derivative filter, horizontal/vertical lines, some smoothning)
     t1_sobel = ndimage.sobel(t1)
@@ -277,12 +277,12 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1_sobel), axis=1)
     X = np.concatenate((X, t2_sobel), axis=1)
 
-    features += ('T1 sobel filter',)
-    features += ('T2 sobel filter',)
+    features += ('T1 sobel intensity',)
+    features += ('T2 sobel intensity',)
 
     # rank filter (smoothning filter)
-    t1_rank = ndimage.rank_filter(t1, rank=30, size=20)
-    t2_rank = ndimage.rank_filter(t2, rank=30, size=20)
+    t1_rank = ndimage.rank_filter(t1, rank=30, size=10)
+    t2_rank = ndimage.rank_filter(t2, rank=30, size=10)
 
     fig2 = plt.figure(figsize=(10,10))
     ax17 = fig2.add_subplot(181)
@@ -298,8 +298,8 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1_sobel), axis=1)
     X = np.concatenate((X, t2_sobel), axis=1)
 
-    features += ('T1 rank filter',)
-    features += ('T2 rank filter',)
+    features += ('T1 rank intensity',)
+    features += ('T2 rank intensity',)
 
     # prewitt filter (edge detection, derivative filter, horizontal/vertical lines, some smoothning)
     # looks like sobel filter but has different kernel, only horizonal or vertical lines
@@ -319,8 +319,8 @@ def extract_features(image_number, slice_number):
     X = np.concatenate((X, t1_prewitt), axis=1)
     X = np.concatenate((X, t2_prewitt), axis=1)
 
-    features += ('T1 prewitt filter',)
-    features += ('T2 prewitt filter',)
+    features += ('T1 prewitt intensity',)
+    features += ('T2 prewitt intensity',)
 
     #------------------------------------------------------------------#
     return X, features
